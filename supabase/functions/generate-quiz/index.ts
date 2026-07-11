@@ -34,7 +34,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, topic, studentLevel, weakAreas, strongAreas, studentId } = await req.json();
+    const { messages, topic, studentLevel, weakAreas, strongAreas, studentId, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -156,7 +156,12 @@ ${chatContext || `General study session about ${topic || "various topics"}`}`;
       body: JSON.stringify({
         model: MODEL,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemPrompt + "\n\n" + (({
+              en: "LANGUAGE: Write all question text, options, and explanations in clear simple English only.",
+              hi: "LANGUAGE: सभी प्रश्न, विकल्प और स्पष्टीकरण केवल शुद्ध हिन्दी (देवनागरी लिपि) में लिखें।",
+              hinglish: "LANGUAGE: Write all question text, options, and explanations in Hinglish (Hindi + English mixed, Roman script only). Do not use Devanagari.",
+              kn: "LANGUAGE: ಎಲ್ಲಾ ಪ್ರಶ್ನೆಗಳು, ಆಯ್ಕೆಗಳು ಮತ್ತು ವಿವರಣೆಗಳನ್ನು ಕೇವಲ ಕನ್ನಡ ಲಿಪಿಯಲ್ಲಿ ಬರೆಯಿರಿ.",
+            } as Record<string, string>)[language as string] || "LANGUAGE: Write questions in Hinglish (Roman script).") },
           { role: "user", content: `Generate exactly ${questionCount} adaptive quiz questions for "${topic || 'General Study'}". Student level: ${studentLevel || 'average'}. Create questions ONLY from the study session content provided. Make questions progressively harder.` }
         ],
         max_tokens: 3500,
