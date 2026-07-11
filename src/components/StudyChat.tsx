@@ -10,6 +10,7 @@ import SoundWave from "@/components/SoundWave";
 import VoiceInputIndicator from "@/components/VoiceInputIndicator";
 import Confetti from "@/components/Confetti";
 import TypingText from "@/components/TypingText";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Web Speech API types
 interface SpeechRecognitionEvent extends Event {
