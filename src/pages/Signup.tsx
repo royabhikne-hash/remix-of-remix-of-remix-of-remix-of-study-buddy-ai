@@ -436,7 +436,11 @@ const Signup = () => {
                   <Link to="/terms" className="text-primary hover:underline font-medium" target="_blank">
                     Terms & Conditions
                   </Link>{" "}
-                  of Edu Improvement AI
+                  and{" "}
+                  <Link to="/cookies" className="text-primary hover:underline font-medium" target="_blank">
+                    Cookies Policy
+                  </Link>{" "}
+                  of Gyanam
                 </label>
               </div>
 
