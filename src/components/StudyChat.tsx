@@ -10,6 +10,7 @@ import SoundWave from "@/components/SoundWave";
 import VoiceInputIndicator from "@/components/VoiceInputIndicator";
 import Confetti from "@/components/Confetti";
 import TypingText from "@/components/TypingText";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Web Speech API types
 interface SpeechRecognitionEvent extends Event {
@@ -104,6 +105,7 @@ interface StudyChatProps {
 
 const StudyChat = ({ onEndStudy, studentId }: StudyChatProps) => {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
@@ -424,7 +426,8 @@ const StudyChat = ({ onEndStudy, studentId }: StudyChatProps) => {
           messages: formattedMessages, 
           studentId, 
           analyzeSession: true,
-          currentTopic: currentTopic || undefined // Pass current topic to AI
+          currentTopic: currentTopic || undefined,
+          language,
         }
       });
 
@@ -622,7 +625,8 @@ const StudyChat = ({ onEndStudy, studentId }: StudyChatProps) => {
           topic: currentTopic || "General Study",
           studentLevel: analysis.currentUnderstanding,
           weakAreas: analysis.weakAreas,
-          strongAreas: analysis.strongAreas
+          strongAreas: analysis.strongAreas,
+          language,
         }
       });
 

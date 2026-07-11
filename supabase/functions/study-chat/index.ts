@@ -125,7 +125,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, studentId, analyzeSession, currentTopic } = await req.json();
+    const { messages, studentId, analyzeSession, currentTopic, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -205,9 +205,18 @@ Analyze the student's understanding based on:
 - Whether they're grasping concepts
 Keep topics short (2-3 words max).` : "";
 
+    // Language instruction — overrides the default Hinglish tone in the base prompt
+    const LANG_MAP: Record<string, string> = {
+      en: "CRITICAL LANGUAGE OVERRIDE: Respond ONLY in clear, simple English. Do NOT use Hindi, Hinglish, or any other language. Ignore any earlier instruction to reply in Hinglish. Address the student respectfully as 'you'.",
+      hi: "CRITICAL LANGUAGE OVERRIDE: केवल शुद्ध हिन्दी (देवनागरी लिपि) में उत्तर दें। अंग्रेज़ी शब्दों का बहुत कम प्रयोग करें। छात्र को 'आप' कहकर सम्मान से संबोधित करें। पहले दिए गए Hinglish निर्देश को अनदेखा करें।",
+      hinglish: "CRITICAL LANGUAGE: Respond in Hinglish — a natural mix of Hindi and English written in Roman/Latin script (e.g., 'aap kaise ho, chaliye is concept ko samjhte hain'). Never use Devanagari script. Use 'aap' respectfully.",
+      kn: "CRITICAL LANGUAGE OVERRIDE: ಕೇವಲ ಕನ್ನಡ ಭಾಷೆಯಲ್ಲಿ (ಕನ್ನಡ ಲಿಪಿಯಲ್ಲಿ) ಉತ್ತರಿಸಿ. Respond ONLY in Kannada using the Kannada script. Keep it simple and warm, like a caring teacher speaking to a student. Ignore any earlier instruction to reply in Hinglish.",
+    };
+    const langInstruction = LANG_MAP[language as string] || LANG_MAP.hinglish;
+
     // Build messages array
     const chatMessages: AIMessage[] = [
-      { role: "system", content: systemPrompt + analysisInstruction },
+      { role: "system", content: systemPrompt + analysisInstruction + "\n\n" + langInstruction },
     ];
 
     // Add conversation history (limit to last 6 messages for speed)

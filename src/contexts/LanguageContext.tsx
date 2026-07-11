@@ -1,6 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'hinglish' | 'kn';
+
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  en: 'English',
+  hi: 'हिन्दी',
+  hinglish: 'Hinglish',
+  kn: 'ಕನ್ನಡ',
+};
+
+export const AI_LANGUAGE_INSTRUCTION: Record<Language, string> = {
+  en: 'Respond ONLY in clear, simple English. Do not mix Hindi or any other language.',
+  hi: 'केवल शुद्ध हिन्दी (देवनागरी लिपि) में जवाब दें। अंग्रेज़ी शब्दों का बहुत कम प्रयोग करें।',
+  hinglish: 'Respond in Hinglish — a natural mix of Hindi and English written in Roman/Latin script (e.g., "aap kaise ho, let\'s revise this concept"). Never use Devanagari script.',
+  kn: 'ಕೇವಲ ಕನ್ನಡ ಭಾಷೆಯಲ್ಲಿ (ಕನ್ನಡ ಲಿಪಿಯಲ್ಲಿ) ಉತ್ತರಿಸಿ. Respond ONLY in Kannada using the Kannada script. Keep it simple and clear for a student.',
+};
 
 interface Translations {
   [key: string]: {
@@ -209,31 +223,37 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+const VALID_LANGS: Language[] = ['en', 'hi', 'hinglish', 'kn'];
+
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
-    const stored = localStorage.getItem('appLanguage');
-    return (stored === 'en' || stored === 'hi') ? stored : 'en';
+    const stored = localStorage.getItem('appLanguage') as Language | null;
+    return stored && VALID_LANGS.includes(stored) ? stored : 'en';
   });
 
   useEffect(() => {
     localStorage.setItem('appLanguage', language);
   }, [language]);
 
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-  };
+  const setLanguage = (lang: Language) => setLanguageState(lang);
 
   const toggleLanguage = () => {
-    setLanguageState(prev => prev === 'en' ? 'hi' : 'en');
+    setLanguageState(prev => {
+      const idx = VALID_LANGS.indexOf(prev);
+      return VALID_LANGS[(idx + 1) % VALID_LANGS.length];
+    });
   };
 
+  // For UI labels we only have en/hi strings; hinglish + kn fall back to English UI
+  // (the AI teacher itself still responds in the chosen language).
   const t = (key: string): string => {
     const translation = translations[key];
     if (!translation) {
       console.warn(`Translation missing for key: ${key}`);
       return key;
     }
-    return translation[language];
+    if (language === 'hi') return translation.hi;
+    return translation.en;
   };
 
   return (
@@ -250,3 +270,4 @@ export const useLanguage = (): LanguageContextType => {
   }
   return context;
 };
+
