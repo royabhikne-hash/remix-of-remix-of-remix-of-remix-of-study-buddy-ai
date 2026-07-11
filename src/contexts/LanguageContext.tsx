@@ -1,6 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'hinglish' | 'kn';
+
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  en: 'English',
+  hi: 'हिन्दी',
+  hinglish: 'Hinglish',
+  kn: 'ಕನ್ನಡ',
+};
+
+export const AI_LANGUAGE_INSTRUCTION: Record<Language, string> = {
+  en: 'Respond ONLY in clear, simple English. Do not mix Hindi or any other language.',
+  hi: 'केवल शुद्ध हिन्दी (देवनागरी लिपि) में जवाब दें। अंग्रेज़ी शब्दों का बहुत कम प्रयोग करें।',
+  hinglish: 'Respond in Hinglish — a natural mix of Hindi and English written in Roman/Latin script (e.g., "aap kaise ho, let\'s revise this concept"). Never use Devanagari script.',
+  kn: 'ಕೇವಲ ಕನ್ನಡ ಭಾಷೆಯಲ್ಲಿ (ಕನ್ನಡ ಲಿಪಿಯಲ್ಲಿ) ಉತ್ತರಿಸಿ. Respond ONLY in Kannada using the Kannada script. Keep it simple and clear for a student.',
+};
 
 interface Translations {
   [key: string]: {
