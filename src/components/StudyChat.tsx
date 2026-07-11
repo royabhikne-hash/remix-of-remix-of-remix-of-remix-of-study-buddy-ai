@@ -105,6 +105,7 @@ interface StudyChatProps {
 
 const StudyChat = ({ onEndStudy, studentId }: StudyChatProps) => {
   const { toast } = useToast();
+  const { language } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "1",
@@ -425,7 +426,8 @@ const StudyChat = ({ onEndStudy, studentId }: StudyChatProps) => {
           messages: formattedMessages, 
           studentId, 
           analyzeSession: true,
-          currentTopic: currentTopic || undefined // Pass current topic to AI
+          currentTopic: currentTopic || undefined,
+          language,
         }
       });
 
@@ -623,7 +625,8 @@ const StudyChat = ({ onEndStudy, studentId }: StudyChatProps) => {
           topic: currentTopic || "General Study",
           studentLevel: analysis.currentUnderstanding,
           weakAreas: analysis.weakAreas,
-          strongAreas: analysis.strongAreas
+          strongAreas: analysis.strongAreas,
+          language,
         }
       });
 
